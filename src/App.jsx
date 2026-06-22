@@ -1,4 +1,4 @@
-cat > /mnt/user-data/outputs/App.jsx << 'ENDOFFILE'
+
 import { useState, useEffect, useRef } from "react";
 import {
   SignedIn, SignedOut, useClerk, useUser, SignIn, SignUp,
