@@ -33,6 +33,110 @@ const ONBOARDING_SLIDES = [
   {title:"Scalpers cannot win.",body:"Named tickets, ID checks, and face-value-only resale. Full stop.",accent:T.teal,bg:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80"},
 ];
 
+// ─── Mock artist dashboard data ───────────────────────────────────────────────
+const ARTIST_EVENT = {
+  artist: "Hozier",
+  venue: "O2 Arena, London",
+  date: "Sat 14 Sep 2026",
+  time: "19:30",
+  price: 65,
+  totalTickets: 2000,
+  sold: 1157,
+  revenue: 75205,
+  waitlistCount: 412,
+  tierBreakdown: { 1: 38, 2: 41, 3: 21 },
+  salesByDay: [
+    { day: "Mon", sold: 120 },
+    { day: "Tue", sold: 210 },
+    { day: "Wed", sold: 185 },
+    { day: "Thu", sold: 340 },
+    { day: "Fri", sold: 302 },
+  ],
+  recentBuyers: [
+    { name: "Emma T.", tier: 1, score: 88, seat: "Block A, Row 3, Seat 12", time: "2 mins ago" },
+    { name: "Liam R.", tier: 1, score: 74, seat: "Block A, Row 3, Seat 13", time: "7 mins ago" },
+    { name: "Priya S.", tier: 2, score: 61, seat: "Block C, Row 8, Seat 4",  time: "12 mins ago" },
+    { name: "Jake M.", tier: 2, score: 55, seat: "Block D, Row 11, Seat 20", time: "18 mins ago" },
+    { name: "Aisha K.", tier: 1, score: 91, seat: "Block A, Row 2, Seat 7",  time: "25 mins ago" },
+  ],
+};
+
+// ─── QR code loader (CDN) ─────────────────────────────────────────────────────
+function useQRLib() {
+  const [ready, setReady] = useState(!!window.QRCode);
+  useEffect(() => {
+    if (window.QRCode) { setReady(true); return; }
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+    s.onload = () => setReady(true);
+    document.head.appendChild(s);
+  }, []);
+  return ready;
+}
+
+function QRCode({ value, size = 160 }) {
+  const ref = useRef(null);
+  const qrReady = useQRLib();
+  const instanceRef = useRef(null);
+
+  useEffect(() => {
+    if (!qrReady || !ref.current) return;
+    if (instanceRef.current) {
+      ref.current.innerHTML = "";
+      instanceRef.current = null;
+    }
+    instanceRef.current = new window.QRCode(ref.current, {
+      text: value,
+      width: size,
+      height: size,
+      colorDark: "#0A0A0F",
+      colorLight: "#F1F0F5",
+      correctLevel: window.QRCode.CorrectLevel.H,
+    });
+  }, [qrReady, value, size]);
+
+  if (!qrReady) return (
+    <div style={{ width: size, height: size, background: T.border, borderRadius: 10,
+      display: "flex", alignItems: "center", justifyContent: "center", color: T.muted, fontSize: 12 }}>
+      Loading…
+    </div>
+  );
+  return <div ref={ref} style={{ borderRadius: 10, overflow: "hidden", lineHeight: 0 }} />;
+}
+
+// ─── Ticket QR wallet modal ────────────────────────────────────────────────────
+function TicketQRModal({ ticket, open, onClose }) {
+  if (!ticket) return null;
+  const qrValue = `FANFIRST:${ticket.id}:${ticket.artist.replace(/\s/g,"")}:${ticket.seat}`;
+  return (
+    <Modal open={open} onClose={onClose} noPad>
+      <div style={{ position: "relative", height: 120 }}>
+        <img src={ticket.img} alt={ticket.artist} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,#16161F 0%,transparent 60%)" }} />
+        <button onClick={onClose} style={{ position:"absolute",top:12,right:12,background:"#00000066",border:"none",color:"#fff",borderRadius:99,width:30,height:30,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center" }}>x</button>
+        <div style={{ position:"absolute",bottom:12,left:16 }}>
+          <div style={{ fontSize:20,fontWeight:900,color:"#fff" }}>{ticket.artist}</div>
+          <div style={{ fontSize:12,color:"#ffffff88" }}>{ticket.venue}</div>
+        </div>
+      </div>
+      <div style={{ padding:"24px 20px 36px", textAlign:"center" }}>
+        <div style={{ fontSize:11,color:T.muted,letterSpacing:1.5,textTransform:"uppercase",fontWeight:700,marginBottom:18 }}>Your Entry QR Code</div>
+        <div style={{ display:"inline-block",background:"#F1F0F5",padding:16,borderRadius:16,marginBottom:18,boxShadow:"0 0 40px "+T.gold+"22" }}>
+          <QRCode value={qrValue} size={180} />
+        </div>
+        <div style={{ background:T.surface,border:"1px solid "+T.border,borderRadius:12,padding:"12px 16px",marginBottom:14,textAlign:"left" }}>
+          <div style={{ fontSize:12,color:T.muted,marginBottom:4 }}>📅 {ticket.date} at {ticket.time}</div>
+          <div style={{ fontSize:12,color:T.muted,marginBottom:4 }}>🪑 {ticket.seat}</div>
+          <div style={{ fontSize:11,color:T.subtle,fontFamily:"monospace",marginTop:8,wordBreak:"break-all" }}>ID: {ticket.id}</div>
+        </div>
+        <div style={{ fontSize:11,color:T.muted,lineHeight:1.7 }}>
+          Present this QR at the door. Named to you — ID required. Active 48hrs before the show.
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 const getTier = s => s >= 70 ? 1 : s >= 40 ? 2 : 3;
 const getTierColor = t => ({1:T.gold,2:T.violet,3:T.teal})[t] || T.muted;
 const getTierLabel = t => ({1:"Tier 1 Top Fan",2:"Tier 2 Loyal Fan",3:"Tier 3 Verified"})[t] || "Unranked";
@@ -59,9 +163,18 @@ function Toast({toasts}) {
   );
 }
 
-function Logo({size=28}) {
+function Logo({size=28, onSecretTap}) {
+  const tapCount = useRef(0);
+  const tapTimer = useRef(null);
+  function handleTap() {
+    if (!onSecretTap) return;
+    tapCount.current += 1;
+    clearTimeout(tapTimer.current);
+    if (tapCount.current >= 5) { tapCount.current = 0; onSecretTap(); return; }
+    tapTimer.current = setTimeout(() => { tapCount.current = 0; }, 2000);
+  }
   return (
-    <div style={{display:"flex",alignItems:"center",gap:9}}>
+    <div style={{display:"flex",alignItems:"center",gap:9,cursor:onSecretTap?"pointer":"default",userSelect:"none"}} onClick={handleTap}>
       <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
         <rect width="32" height="32" rx="9" fill={T.gold}/>
         <path d="M9 8h14v3.5H13v4h9v3.5h-9V24H9V8z" fill="#0A0A0F"/>
@@ -216,6 +329,7 @@ function AuthScreen({mode,setMode}) {
     </div>
   );
 }
+
 function QuizModal({open,onClose,onComplete}) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -548,6 +662,134 @@ function BuyModal({concert,open,onClose,userTier,verified,onVerify,onSuccess}) {
     </Modal>
   );
 }
+
+// ─── Artist Dashboard ─────────────────────────────────────────────────────────
+function MiniBar({ value, max, color }) {
+  const pct = Math.min((value / max) * 100, 100);
+  return (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+      <div style={{ width: "100%", height: 80, background: T.border, borderRadius: 6, position: "relative", overflow: "hidden", display: "flex", alignItems: "flex-end" }}>
+        <div style={{ width: "100%", height: pct + "%", background: color, borderRadius: "6px 6px 0 0", transition: "height 1s ease", boxShadow: "0 0 12px " + color + "55" }} />
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value, sub, color = T.gold }) {
+  return (
+    <div style={{ background: T.card, border: "1px solid " + T.border, borderRadius: 16, padding: "14px 16px", flex: 1 }}>
+      <div style={{ fontSize: 11, color: T.muted, marginBottom: 6, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</div>
+      <div style={{ fontSize: 22, fontWeight: 900, color }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, color: T.muted, marginTop: 3 }}>{sub}</div>}
+    </div>
+  );
+}
+
+function ArtistDashboard() {
+  const ev = ARTIST_EVENT;
+  const soldPct = Math.round((ev.sold / ev.totalTickets) * 100);
+  const maxDaySales = Math.max(...ev.salesByDay.map(d => d.sold));
+
+  return (
+    <div style={{ padding: "0 0 20px" }}>
+      {/* Event hero */}
+      <div style={{ background: "linear-gradient(135deg,#1A0F28 0%," + T.card + " 100%)", border: "1px solid " + T.border, borderRadius: 20, padding: 18, marginBottom: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: T.gold + "22", border: "1px solid " + T.gold + "44", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>🎤</div>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{ev.artist}</div>
+            <div style={{ fontSize: 12, color: T.muted }}>{ev.venue} · {ev.date}</div>
+          </div>
+          <div style={{ marginLeft: "auto", background: T.green + "22", border: "1px solid " + T.green + "44", borderRadius: 99, padding: "4px 12px", fontSize: 11, color: T.green, fontWeight: 700 }}>LIVE</div>
+        </div>
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+            <span style={{ fontSize: 12, color: T.muted }}>Tickets sold</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: T.text }}>{ev.sold.toLocaleString()} / {ev.totalTickets.toLocaleString()}</span>
+          </div>
+          <div style={{ background: T.border, borderRadius: 99, height: 6 }}>
+            <div style={{ width: soldPct + "%", background: T.gold, height: "100%", borderRadius: 99, boxShadow: "0 0 10px " + T.gold + "66" }} />
+          </div>
+          <div style={{ fontSize: 11, color: T.muted, marginTop: 4 }}>{soldPct}% sold · {(ev.totalTickets - ev.sold).toLocaleString()} remaining</div>
+        </div>
+      </div>
+
+      {/* Key stats */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+        <StatCard label="Revenue" value={"£" + ev.revenue.toLocaleString()} sub="face value total" color={T.gold} />
+        <StatCard label="Waitlist" value={ev.waitlistCount} sub="fans queued" color={T.violet} />
+      </div>
+      <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+        <StatCard label="Avg Fan Score" value="67" sub="across all buyers" color={T.teal} />
+        <StatCard label="ID Verified" value="100%" sub="of ticket holders" color={T.green} />
+      </div>
+
+      {/* Fan tier distribution */}
+      <div style={{ background: T.card, border: "1px solid " + T.border, borderRadius: 20, padding: 18, marginBottom: 14 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 14 }}>Fan Tier Distribution</div>
+        {[
+          { tier: 1, label: "Tier 1 — Top Fans", pct: ev.tierBreakdown[1], color: T.gold },
+          { tier: 2, label: "Tier 2 — Loyal Fans", pct: ev.tierBreakdown[2], color: T.violet },
+          { tier: 3, label: "Tier 3 — Verified", pct: ev.tierBreakdown[3], color: T.teal },
+        ].map(row => (
+          <div key={row.tier} style={{ marginBottom: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+              <span style={{ fontSize: 12, color: T.muted }}>{row.label}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: row.color }}>{row.pct}%</span>
+            </div>
+            <div style={{ background: T.border, borderRadius: 99, height: 5 }}>
+              <div style={{ width: row.pct + "%", background: row.color, height: "100%", borderRadius: 99, boxShadow: "0 0 8px " + row.color + "55" }} />
+            </div>
+          </div>
+        ))}
+        <div style={{ marginTop: 12, padding: "10px 12px", background: T.gold + "0D", border: "1px solid " + T.gold + "33", borderRadius: 10, fontSize: 12, color: T.muted, lineHeight: 1.6 }}>
+          <span style={{ color: T.gold, fontWeight: 700 }}>79%</span> of buyers are Tier 1 or 2 fans — these are your most dedicated listeners.
+        </div>
+      </div>
+
+      {/* Sales over time chart */}
+      <div style={{ background: T.card, border: "1px solid " + T.border, borderRadius: 20, padding: 18, marginBottom: 14 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 16 }}>Sales This Week</div>
+        <div style={{ display: "flex", gap: 8, alignItems: "flex-end", height: 100 }}>
+          {ev.salesByDay.map((d, i) => (
+            <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+              <div style={{ fontSize: 10, color: T.muted, fontWeight: 600 }}>{d.sold}</div>
+              <div style={{ width: "100%", height: 80, background: T.border, borderRadius: 6, position: "relative", overflow: "hidden", display: "flex", alignItems: "flex-end" }}>
+                <div style={{ width: "100%", height: Math.round((d.sold / maxDaySales) * 100) + "%", background: i === ev.salesByDay.length - 1 ? T.gold : T.violet + "99", borderRadius: "6px 6px 0 0", transition: "height 1s ease", boxShadow: i === ev.salesByDay.length - 1 ? "0 0 12px " + T.gold + "66" : "none" }} />
+              </div>
+              <div style={{ fontSize: 10, color: T.muted }}>{d.day}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: 11, color: T.muted, marginTop: 12 }}>Thursday spike from Tier 1 early-access window opening.</div>
+      </div>
+
+      {/* Recent buyers */}
+      <div style={{ background: T.card, border: "1px solid " + T.border, borderRadius: 20, padding: 18 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 14 }}>Recent Buyers</div>
+        {ev.recentBuyers.map((b, i) => {
+          const col = getTierColor(b.tier);
+          return (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i < ev.recentBuyers.length - 1 ? "1px solid " + T.border : "none" }}>
+              <div style={{ width: 36, height: 36, borderRadius: 99, background: col + "22", border: "1px solid " + col + "44", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: col, flexShrink: 0 }}>
+                {b.name[0]}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{b.name}</div>
+                <div style={{ fontSize: 11, color: T.muted, marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.seat}</div>
+              </div>
+              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                <div style={{ fontSize: 12, color: col, fontWeight: 700 }}>Score {b.score}</div>
+                <div style={{ fontSize: 10, color: T.muted, marginTop: 1 }}>{b.time}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function SettingsDrawer({open,onClose,user,localPhoto,onPhotoChange,onSignOut,spotifyLinked,setSpotifyLinked,appleLinked,setAppleLinked,notifications,setNotifications,emailAlerts,setEmailAlerts,earlyAccess,setEarlyAccess,score,userTier,showToast}) {
   const fileRef = useRef();
   const name = user?.firstName ? (user.firstName+" "+(user.lastName||"")).trim() : (user?.emailAddresses?.[0]?.emailAddress||"Fan");
@@ -638,6 +880,7 @@ function MainApp() {
   const {toasts, show: showToast} = useToast();
 
   const [tab, setTab] = useState("discover");
+  const [artistMode, setArtistMode] = useState(false);
   const [score, setScore] = useState(0);
   const [quizDone, setQuizDone] = useState(false);
   const [verified, setVerified] = useState(false);
@@ -660,6 +903,7 @@ function MainApp() {
   const [editOpen, setEditOpen] = useState(false);
   const [buying, setBuying] = useState(null);
   const [expandConcert, setExpandConcert] = useState(null);
+  const [qrTicket, setQrTicket] = useState(null);
 
   const bonusScore = (spotifyLinked?18:0)+(appleLinked?8:0)+(verified?5:0);
   const totalScore = Math.min(score+bonusScore, 100);
@@ -704,7 +948,24 @@ function MainApp() {
     showToast(qty+" ticket"+(qty>1?"s":"")+" confirmed for "+concert.artist,"success");
   }
 
-  const tabs = [{id:"discover",label:"Discover",icon:"♪"},{id:"profile",label:"Profile",icon:"◉"},{id:"tickets",label:"Tickets",icon:"◈"}];
+  function handleSecretTap() {
+    setArtistMode(m => {
+      const next = !m;
+      showToast(next ? "🎤 Artist view unlocked" : "Fan view restored", "success");
+      if (next) setTab("artist");
+      else setTab("discover");
+      return next;
+    });
+  }
+
+  const fanTabs = [
+    {id:"discover",label:"Discover",icon:"♪"},
+    {id:"profile",label:"Profile",icon:"◉"},
+    {id:"tickets",label:"Tickets",icon:"◈"},
+  ];
+  const tabs = artistMode
+    ? [...fanTabs, {id:"artist",label:"Dashboard",icon:"📊"}]
+    : fanTabs;
 
   return (
     <div style={{fontFamily:"'Inter','Segoe UI',sans-serif",background:T.bg,minHeight:"100vh",color:T.text,maxWidth:480,margin:"0 auto",paddingBottom:80}}>
@@ -712,7 +973,10 @@ function MainApp() {
 
       <div style={{background:T.surface,borderBottom:"1px solid "+T.border,padding:"16px 18px 14px",position:"sticky",top:0,zIndex:10,backdropFilter:"blur(12px)"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <Logo size={24}/>
+          <Logo size={24} onSecretTap={handleSecretTap}/>
+          {artistMode && tab==="artist" && (
+            <div style={{background:T.gold+"18",border:"1px solid "+T.gold+"44",borderRadius:99,padding:"3px 10px",fontSize:11,color:T.gold,fontWeight:700}}>Artist View</div>
+          )}
           <button onClick={() => setDrawerOpen(true)} style={{width:38,height:38,borderRadius:99,border:"2px solid "+T.gold,background:T.border,overflow:"hidden",cursor:"pointer",padding:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:800,color:T.gold,position:"relative",flexShrink:0}}>
             {imgSrc ? <img src={imgSrc} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/> : initials}
             <div style={{position:"absolute",bottom:0,right:0,width:9,height:9,background:T.green,borderRadius:99,border:"2px solid "+T.bg}}/>
@@ -722,6 +986,7 @@ function MainApp() {
           {tab==="discover"&&"Upcoming Shows"}
           {tab==="profile"&&"Fan Profile"}
           {tab==="tickets"&&"My Tickets"}
+          {tab==="artist"&&"Artist Dashboard"}
         </h1>
       </div>
 
@@ -758,207 +1023,4 @@ function MainApp() {
 
             <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,marginBottom:18}}>
               {GENRES.map(g => (
-                <button key={g} onClick={() => setGenreFilter(g)} style={{background:genreFilter===g?T.gold:T.card,color:genreFilter===g?T.bg:T.muted,border:"1px solid "+(genreFilter===g?T.gold:T.border),borderRadius:99,padding:"6px 14px",fontSize:12,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
-                  {g}
-                </button>
-              ))}
-            </div>
-
-            {filteredConcerts.length===0 ? (
-              <div style={{textAlign:"center",padding:"60px 20px",color:T.muted}}>
-                <div style={{fontSize:40,marginBottom:12}}>🔍</div>
-                <div style={{fontSize:16,fontWeight:600,color:T.text,marginBottom:8}}>No shows found</div>
-                <button onClick={() => { setSearch(""); setGenreFilter("All"); }} style={{background:T.gold,border:"none",borderRadius:10,padding:"10px 20px",fontWeight:700,fontSize:13,color:T.bg,cursor:"pointer"}}>Clear filters</button>
-              </div>
-            ) : filteredConcerts.map(c => (
-              <ConcertCard key={c.id} concert={c} userTier={userTier}
-                onBuy={c => setBuying(c)}
-                onExpand={setExpandConcert}
-                waitlisted={!!waitlists.find(w => w.id===c.id)}
-                onWaitlist={toggleWaitlist}/>
-            ))}
-          </>
-        )}
-
-        {tab==="profile" && (
-          <>
-            <div style={{background:T.card,border:"1px solid "+T.border,borderRadius:20,padding:20,marginBottom:14,textAlign:"center"}}>
-              <button onClick={() => setDrawerOpen(true)} style={{width:88,height:88,borderRadius:99,border:"3px solid "+T.gold,background:T.border,overflow:"hidden",cursor:"pointer",padding:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:30,fontWeight:800,color:T.gold,margin:"0 auto 4px"}}>
-                {imgSrc ? <img src={imgSrc} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/> : initials}
-              </button>
-              <div style={{fontSize:11,color:T.gold,marginBottom:12,cursor:"pointer"}} onClick={() => setEditOpen(true)}>Edit profile</div>
-              <div style={{position:"relative",display:"inline-block"}}>
-                <ScoreRing score={totalScore} size={96} animated/>
-                <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
-                  <span style={{fontSize:24,fontWeight:900,color:T.gold}}>{totalScore}</span>
-                  <span style={{fontSize:10,color:T.muted}}>/ 100</span>
-                </div>
-              </div>
-              <h2 style={{margin:"12px 0 6px",color:T.text,fontWeight:800}}>{name}</h2>
-              {bio && <p style={{color:T.muted,fontSize:13,margin:"0 0 8px"}}>{bio}</p>}
-              {location && <p style={{color:T.muted,fontSize:12,margin:"0 0 10px"}}>📍 {location}</p>}
-              <TierBadge tier={userTier}/>
-              <div style={{display:"flex",gap:8,justifyContent:"center",marginTop:10,flexWrap:"wrap"}}>
-                {verified && <span style={{fontSize:11,color:T.green}}>✓ ID Verified</span>}
-                {spotifyLinked && <span style={{fontSize:11,color:"#1DB954"}}>🟢 Spotify</span>}
-                {appleLinked && <span style={{fontSize:11,color:T.muted}}>🎵 Apple Music</span>}
-              </div>
-            </div>
-
-            <div style={{background:T.card,border:"1px solid "+T.border,borderRadius:20,padding:20,marginBottom:14}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-                <div style={{fontSize:14,fontWeight:700,color:T.text}}>Score Breakdown</div>
-                <button onClick={() => setQuizOpen(true)} style={{background:T.gold+"22",border:"1px solid "+T.gold+"44",color:T.gold,borderRadius:8,padding:"5px 10px",fontSize:11,fontWeight:700,cursor:"pointer"}}>
-                  {quizDone?"Retake":"Take Quiz"}
-                </button>
-              </div>
-              <ProgressBar value={Math.round(totalScore*0.42)} max={50} label="🎵 Streaming history" color={T.gold}/>
-              <ProgressBar value={Math.round(totalScore*0.26)} max={30} label="🎪 Past attendance" color={T.violet}/>
-              <ProgressBar value={Math.round(totalScore*0.18)} max={20} label="👕 Merch purchases" color={T.teal}/>
-              <ProgressBar value={Math.round(totalScore*0.14)} max={15} label="📱 Social engagement" color="#FF9F7F"/>
-              {bonusScore>0 && (
-                <div style={{marginTop:12,padding:"10px 12px",background:T.green+"11",border:"1px solid "+T.green+"33",borderRadius:10,fontSize:12,color:T.green}}>
-                  +{bonusScore} bonus pts from connected services
-                </div>
-              )}
-              {!spotifyLinked && (
-                <div onClick={() => setDrawerOpen(true)} style={{marginTop:12,padding:"11px 14px",background:T.surface,border:"1px solid "+T.border,borderRadius:12,fontSize:12,color:T.muted,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                  <span>Link Spotify to earn <strong style={{color:T.gold}}>+18 pts</strong></span>
-                  <span style={{color:T.gold,fontSize:12}}>Connect</span>
-                </div>
-              )}
-            </div>
-
-            <div style={{background:T.card,border:"1px solid "+T.border,borderRadius:20,padding:20,marginBottom:14}}>
-              <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:14}}>Access Level</div>
-              {[{tier:1,req:"Score 70+",col:T.gold},{tier:2,req:"Score 40+",col:T.violet},{tier:3,req:"Any score",col:T.teal}].map(w => {
-                const active = userTier<=w.tier;
-                return (
-                  <div key={w.tier} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:w.tier<3?"1px solid "+T.border:"none"}}>
-                    <div style={{width:36,height:36,borderRadius:99,background:active?w.col+"22":T.surface,border:"2px solid "+(active?w.col:T.border),display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>
-                      {active?"✓":"🔒"}
-                    </div>
-                    <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:600,color:active?w.col:T.muted}}>{getTierLabel(w.tier)}</div>
-                      <div style={{fontSize:11,color:T.muted}}>{w.req}</div>
-                    </div>
-                    {userTier===w.tier && <span style={{fontSize:10,background:w.col+"22",color:w.col,border:"1px solid "+w.col+"44",borderRadius:99,padding:"2px 8px",fontWeight:700}}>YOUR TIER</span>}
-                  </div>
-                );
-              })}
-            </div>
-
-            {!verified && (
-              <button onClick={() => setVerifyOpen(true)} style={{width:"100%",background:T.red+"18",border:"1px solid "+T.red+"44",borderRadius:14,padding:"13px 0",color:T.red,fontSize:14,cursor:"pointer",fontWeight:700,marginBottom:10}}>
-                Verify Identity to Purchase Tickets
-              </button>
-            )}
-            <button onClick={() => setDrawerOpen(true)} style={{width:"100%",background:T.card,border:"1px solid "+T.border,borderRadius:14,padding:"13px 0",color:T.text,fontSize:14,cursor:"pointer",fontWeight:600}}>
-              Account Settings
-            </button>
-          </>
-        )}
-
-        {tab==="tickets" && (
-          <>
-            {myTickets.length===0 && waitlists.length===0 ? (
-              <div style={{textAlign:"center",padding:"80px 20px",color:T.muted}}>
-                <div style={{fontSize:52,marginBottom:16}}>🎟</div>
-                <div style={{fontSize:18,fontWeight:700,color:T.text,marginBottom:8}}>No tickets yet</div>
-                <p style={{fontSize:13,lineHeight:1.6,margin:"0 0 20px"}}>Discover shows and use your Fan Score to get early access.</p>
-                <button onClick={() => setTab("discover")} style={{background:T.gold,border:"none",borderRadius:12,padding:"11px 24px",fontWeight:700,fontSize:14,color:T.bg,cursor:"pointer"}}>Browse Shows</button>
-              </div>
-            ) : (
-              <>
-                {myTickets.length>0 && (
-                  <>
-                    <div style={{fontSize:11,color:T.muted,letterSpacing:1.5,textTransform:"uppercase",fontWeight:700,marginBottom:12}}>Your Tickets ({myTickets.length})</div>
-                    {myTickets.map(t => (
-                      <div key={t.id} style={{background:T.card,border:"1px solid "+T.border,borderRadius:20,overflow:"hidden",marginBottom:14}}>
-                        <div style={{position:"relative",height:120}}>
-                          <img src={t.img} alt={t.artist} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                          <div style={{position:"absolute",inset:0,background:"linear-gradient(to top,#16161F 0%,transparent 60%)"}}/>
-                          <div style={{position:"absolute",bottom:12,left:14,fontSize:18,fontWeight:900,color:"#fff"}}>{t.artist}</div>
-                          <div style={{position:"absolute",top:12,right:12,background:T.green+"22",border:"1px solid "+T.green+"66",color:T.green,borderRadius:99,padding:"3px 10px",fontSize:11,fontWeight:700}}>Confirmed</div>
-                        </div>
-                        <div style={{padding:"14px 16px 16px"}}>
-                          <div style={{fontSize:12,color:T.muted,marginBottom:2}}>📍 {t.venue}</div>
-                          <div style={{fontSize:12,color:T.muted,marginBottom:2}}>📅 {t.date} at {t.time}</div>
-                          <div style={{fontSize:12,color:T.violet,fontWeight:600,marginBottom:12}}>🪑 {t.seat}</div>
-                          <div style={{background:T.surface,borderRadius:10,padding:"10px 12px",fontSize:11,color:T.muted,lineHeight:1.6,marginBottom:12}}>
-                            Named ticket. ID required at door. Issued 48hrs before show.
-                          </div>
-                          <button onClick={() => showToast("Transfer request submitted","success")} style={{width:"100%",background:"transparent",border:"1px solid "+T.border,borderRadius:10,padding:"9px 0",color:T.muted,fontSize:13,cursor:"pointer"}}>
-                            Request Transfer
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </>
-                )}
-                {waitlists.length>0 && (
-                  <>
-                    <div style={{fontSize:11,color:T.muted,letterSpacing:1.5,textTransform:"uppercase",fontWeight:700,marginBottom:12}}>Waitlists ({waitlists.length})</div>
-                    {waitlists.map(w => (
-                      <div key={w.id} style={{background:T.card,border:"1px solid "+T.border,borderRadius:16,padding:16,marginBottom:10}}>
-                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-                          <div>
-                            <div style={{fontSize:15,fontWeight:700,color:T.text}}>{w.artist}</div>
-                            <div style={{fontSize:12,color:T.muted,marginTop:2}}>{w.venue}</div>
-                            <div style={{fontSize:12,color:T.muted}}>{w.date}</div>
-                          </div>
-                          <div style={{background:T.violet+"22",border:"1px solid "+T.violet+"44",borderRadius:10,padding:"6px 12px",textAlign:"center"}}>
-                            <div style={{fontSize:18,fontWeight:900,color:T.violet}}>#{w.position}</div>
-                            <div style={{fontSize:10,color:T.muted}}>in queue</div>
-                          </div>
-                        </div>
-                        <button onClick={() => toggleWaitlist(w.id)} style={{marginTop:12,width:"100%",background:"transparent",border:"1px solid "+T.border,borderRadius:10,padding:"8px 0",color:T.red,fontSize:12,cursor:"pointer"}}>
-                          Leave Waitlist
-                        </button>
-                      </div>
-                    ))}
-                  </>
-                )}
-              </>
-            )}
-          </>
-        )}
-      </div>
-
-      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} onComplete={s => { setScore(s); setQuizDone(true); showToast("Fan Score saved","success"); }}/>
-      <VerifyModal open={verifyOpen} onClose={() => setVerifyOpen(false)} onVerified={() => { setVerified(true); showToast("Identity verified","success"); }}/>
-      <EditProfileModal open={editOpen} onClose={() => setEditOpen(false)} displayName={name} bio={bio} location={location} onSave={(n,b,l) => { setDisplayName(n); setBio(b); setLocation(l); showToast("Profile updated","success"); }}/>
-      <ConcertDetailModal concert={expandConcert} open={!!expandConcert} onClose={() => setExpandConcert(null)} userTier={userTier} waitlisted={!!waitlists.find(w => w.id===expandConcert?.id)} onWaitlist={toggleWaitlist} onBuy={c => { setExpandConcert(null); setBuying(c); }}/>
-      <BuyModal concert={buying} open={!!buying} onClose={() => setBuying(null)} userTier={userTier} verified={verified} onVerify={() => { setBuying(null); setVerifyOpen(true); }} onSuccess={handleTicketSuccess}/>
-      <SettingsDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} user={user} localPhoto={localPhoto} onPhotoChange={setLocalPhoto} onSignOut={() => { setDrawerOpen(false); signOut(); }} spotifyLinked={spotifyLinked} setSpotifyLinked={setSpotifyLinked} appleLinked={appleLinked} setAppleLinked={setAppleLinked} notifications={notifications} setNotifications={setNotifications} emailAlerts={emailAlerts} setEmailAlerts={setEmailAlerts} earlyAccess={earlyAccess} setEarlyAccess={setEarlyAccess} score={totalScore} userTier={userTier} showToast={showToast}/>
-
-      <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:T.surface,borderTop:"1px solid "+T.border,display:"flex",padding:"10px 0 22px"}}>
-        {tabs.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{flex:1,background:"none",border:"none",cursor:"pointer",padding:"6px 0",display:"flex",flexDirection:"column",alignItems:"center",gap:4,position:"relative"}}>
-            {t.id==="tickets" && myTickets.length>0 && (
-              <div style={{position:"absolute",top:2,right:"50%",transform:"translateX(180%)",width:16,height:16,background:T.gold,borderRadius:99,fontSize:9,color:T.bg,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center"}}>{myTickets.length}</div>
-            )}
-            <span style={{fontSize:19,color:tab===t.id?T.gold:T.muted}}>{t.icon}</span>
-            <span style={{fontSize:10,fontWeight:700,color:tab===t.id?T.gold:T.muted,letterSpacing:0.5,textTransform:"uppercase"}}>{t.label}</span>
-            {tab===t.id && <div style={{width:18,height:2.5,background:T.gold,borderRadius:99}}/>}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export default function App() {
-  const [phase, setPhase] = useState("splash");
-  const [authMode, setAuthMode] = useState("sign-in");
-  return (
-    <>
-      <SignedOut>
-        {phase==="splash" && <SplashScreen onDone={() => setPhase("onboarding")}/>}
-        {phase==="onboarding" && <OnboardingScreen onDone={() => setPhase("auth")}/>}
-        {phase==="auth" && <AuthScreen mode={authMode} setMode={setAuthMode}/>}
-      </SignedOut>
-      <SignedIn><MainApp/></SignedIn>
-    </>
-  );
-}
+                <button key={g} onClick={() => setGenreFilter(g)} style={{background:genreFilter===g?T.gold:T.card,color:genreFilter===g?T.bg:T.muted,border:"1px solid "+(genreFilter===g?T.gold:T.border),borderRadius:99,padding:"6px 14p
