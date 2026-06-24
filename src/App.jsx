@@ -33,7 +33,6 @@ const ONBOARDING_SLIDES = [
   {title:"Scalpers cannot win.",body:"Named tickets, ID checks, and face-value-only resale. Full stop.",accent:T.teal,bg:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80"},
 ];
 
-// ─── Mock artist dashboard data ───────────────────────────────────────────────
 const ARTIST_EVENT = {
   artist: "Hozier",
   venue: "O2 Arena, London",
@@ -61,7 +60,6 @@ const ARTIST_EVENT = {
   ],
 };
 
-// ─── QR code loader (CDN) ─────────────────────────────────────────────────────
 function useQRLib() {
   const [ready, setReady] = useState(!!window.QRCode);
   useEffect(() => {
@@ -104,7 +102,6 @@ function QRCode({ value, size = 160 }) {
   return <div ref={ref} style={{ borderRadius: 10, overflow: "hidden", lineHeight: 0 }} />;
 }
 
-// ─── Ticket QR wallet modal ────────────────────────────────────────────────────
 function TicketQRModal({ ticket, open, onClose }) {
   if (!ticket) return null;
   const qrValue = `FANFIRST:${ticket.id}:${ticket.artist.replace(/\s/g,"")}:${ticket.seat}`;
@@ -113,7 +110,7 @@ function TicketQRModal({ ticket, open, onClose }) {
       <div style={{ position: "relative", height: 120 }}>
         <img src={ticket.img} alt={ticket.artist} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,#16161F 0%,transparent 60%)" }} />
-        <button onClick={onClose} style={{ position:"absolute",top:12,right:12,background:"#00000066",border:"none",color:"#fff",borderRadius:99,width:30,height:30,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center" }}>x</button>
+        <button onClick={onClose} style={{ position:"absolute",top:12,right:12,background:"#00000066",border:"none",color:"#fff",borderRadius:99,width:30,height:30,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center" }}>×</button>
         <div style={{ position:"absolute",bottom:12,left:16 }}>
           <div style={{ fontSize:20,fontWeight:900,color:"#fff" }}>{ticket.artist}</div>
           <div style={{ fontSize:12,color:"#ffffff88" }}>{ticket.venue}</div>
@@ -359,7 +356,7 @@ function QuizModal({open,onClose,onComplete}) {
         <>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
             <div style={{fontSize:13,color:T.muted}}>Question {step+1} of {QUIZ.length}</div>
-            <button onClick={() => { onClose(); reset(); }} style={{background:T.border,border:"none",color:T.muted,borderRadius:99,width:28,height:28,cursor:"pointer",fontSize:13}}>x</button>
+            <button onClick={() => { onClose(); reset(); }} style={{background:T.border,border:"none",color:T.muted,borderRadius:99,width:28,height:28,cursor:"pointer",fontSize:13}}>×</button>
           </div>
           <div style={{background:T.border,borderRadius:99,height:4,marginBottom:24}}>
             <div style={{width:progress+"%",background:T.gold,height:"100%",borderRadius:99,transition:"width 0.3s ease"}}/>
@@ -415,13 +412,14 @@ function VerifyModal({open,onClose,onVerified}) {
       {step===0 && (
         <>
           <div style={{textAlign:"center",marginBottom:20}}>
-            <div style={{fontSize:40,marginBottom:12}}>ID</div>
+            <div style={{fontSize:40,marginBottom:12}}>🪪</div>
             <h3 style={{fontSize:18,fontWeight:800,color:T.text,margin:"0 0 8px"}}>Verify Your Identity</h3>
             <p style={{color:T.muted,fontSize:13,lineHeight:1.6,margin:0}}>Required to purchase tickets. Your details are encrypted and never shared.</p>
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:10,margin:"20px 0"}}>
-            {[["Lock","End-to-end encrypted"],["Eye","Never sold or shared"],["Check","One-time verification"]].map(([icon,text]) => (
+            {[["🔒","End-to-end encrypted"],["🙈","Never sold or shared"],["✅","One-time verification"]].map(([icon,text]) => (
               <div key={text} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:T.surface,border:"1px solid "+T.border,borderRadius:10}}>
+                <span style={{fontSize:18}}>{icon}</span>
                 <span style={{fontSize:13,color:T.muted}}>{text}</span>
               </div>
             ))}
@@ -432,7 +430,7 @@ function VerifyModal({open,onClose,onVerified}) {
       {step===1 && (
         <>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-            <button onClick={() => setStep(0)} style={{background:"none",border:"none",color:T.muted,cursor:"pointer",fontSize:14}}>Back</button>
+            <button onClick={() => setStep(0)} style={{background:"none",border:"none",color:T.muted,cursor:"pointer",fontSize:14}}>← Back</button>
             <div style={{fontSize:12,color:T.muted}}>Step 2 of 2</div>
           </div>
           <h3 style={{fontSize:16,fontWeight:800,color:T.text,margin:"0 0 18px"}}>Your Details</h3>
@@ -459,7 +457,7 @@ function VerifyModal({open,onClose,onVerified}) {
       )}
       {step===2 && (
         <div style={{textAlign:"center",padding:"8px 0"}}>
-          <div style={{fontSize:52,marginBottom:14}}>OK</div>
+          <div style={{fontSize:52,marginBottom:14}}>✅</div>
           <h3 style={{fontSize:20,fontWeight:800,color:T.green,margin:"0 0 8px"}}>Identity Verified</h3>
           <p style={{color:T.muted,fontSize:14,lineHeight:1.6,margin:"0 0 24px"}}>You can now purchase tickets. Your tickets will be named and require ID at the door.</p>
           <button onClick={finish} style={{width:"100%",background:T.gold,border:"none",borderRadius:14,padding:"14px 0",fontWeight:800,fontSize:15,color:T.bg,cursor:"pointer"}}>Done</button>
@@ -478,7 +476,7 @@ function EditProfileModal({open,onClose,displayName,bio,location,onSave}) {
     <Modal open={open} onClose={onClose}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
         <h3 style={{margin:0,fontSize:18,fontWeight:800,color:T.text}}>Edit Profile</h3>
-        <button onClick={onClose} style={{background:T.border,border:"none",color:T.muted,borderRadius:99,width:28,height:28,cursor:"pointer",fontSize:13}}>x</button>
+        <button onClick={onClose} style={{background:T.border,border:"none",color:T.muted,borderRadius:99,width:28,height:28,cursor:"pointer",fontSize:13}}>×</button>
       </div>
       <Input label="Display Name" value={name} onChange={setName} placeholder="Your name"/>
       <div style={{marginBottom:14}}>
@@ -504,7 +502,7 @@ function ConcertDetailModal({concert,open,onClose,userTier,waitlisted,onWaitlist
       <div style={{position:"relative",height:200}}>
         <img src={concert.img} alt={concert.artist} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
         <div style={{position:"absolute",inset:0,background:"linear-gradient(to top,"+T.card+" 0%,transparent 60%)"}}/>
-        <button onClick={onClose} style={{position:"absolute",top:14,right:14,background:"#00000066",border:"none",color:"#fff",borderRadius:99,width:30,height:30,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>x</button>
+        <button onClick={onClose} style={{position:"absolute",top:14,right:14,background:"#00000066",border:"none",color:"#fff",borderRadius:99,width:30,height:30,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
         <div style={{position:"absolute",bottom:14,left:16}}>
           <div style={{fontSize:22,fontWeight:900,color:"#fff"}}>{concert.artist}</div>
           <div style={{fontSize:12,color:"#ffffff88"}}>{concert.genre}</div>
@@ -537,7 +535,7 @@ function ConcertDetailModal({concert,open,onClose,userTier,waitlisted,onWaitlist
         </div>
         <div style={{display:"flex",gap:10}}>
           <button onClick={() => onWaitlist(concert.id)} style={{flex:1,background:waitlisted?T.violet+"22":T.surface,border:"1px solid "+(waitlisted?T.violet:T.border),borderRadius:12,padding:"12px 0",color:waitlisted?T.violet:T.muted,fontSize:13,cursor:"pointer",fontWeight:600}}>
-            {waitlisted?"Waitlisted":"Join Waitlist"}
+            {waitlisted?"★ Waitlisted":"☆ Waitlist"}
           </button>
           <button onClick={() => { onBuy(concert); onClose(); }} style={{flex:2,background:userTier<=2?T.gold:T.surface,border:"none",borderRadius:12,padding:"12px 0",color:userTier<=2?T.bg:T.muted,fontSize:14,cursor:userTier<=2?"pointer":"not-allowed",fontWeight:700}}>
             {userTier<=2?"Get Early Access":"Score too low"}
@@ -615,7 +613,7 @@ function BuyModal({concert,open,onClose,userTier,verified,onVerify,onSuccess}) {
       <div style={{position:"relative",height:140}}>
         <img src={concert.img} alt={concert.artist} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
         <div style={{position:"absolute",inset:0,background:"linear-gradient(to top,#16161F 0%,transparent 60%)"}}/>
-        <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#00000066",border:"none",color:"#fff",borderRadius:99,width:30,height:30,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>x</button>
+        <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#00000066",border:"none",color:"#fff",borderRadius:99,width:30,height:30,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
         <div style={{position:"absolute",bottom:12,left:16}}>
           <div style={{fontSize:20,fontWeight:900,color:"#fff"}}>{concert.artist}</div>
           <div style={{fontSize:12,color:"#ffffff88"}}>{concert.venue}</div>
@@ -635,7 +633,7 @@ function BuyModal({concert,open,onClose,userTier,verified,onVerify,onSuccess}) {
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
                 <span style={{color:T.muted,fontSize:13}}>Quantity</span>
                 <div style={{display:"flex",alignItems:"center",gap:14}}>
-                  <button onClick={() => setQty(q => Math.max(1,q-1))} style={{background:T.border,border:"none",color:T.text,borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:18,display:"flex",alignItems:"center",justifyContent:"center"}}>-</button>
+                  <button onClick={() => setQty(q => Math.max(1,q-1))} style={{background:T.border,border:"none",color:T.text,borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:18,display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
                   <span style={{fontWeight:700,minWidth:16,textAlign:"center"}}>{qty}</span>
                   <button onClick={() => setQty(q => Math.min(2,q+1))} style={{background:T.border,border:"none",color:T.text,borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:18,display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
                 </div>
@@ -653,8 +651,8 @@ function BuyModal({concert,open,onClose,userTier,verified,onVerify,onSuccess}) {
         ) : (
           <div style={{textAlign:"center",padding:"12px 0"}}>
             <div style={{fontSize:52,marginBottom:14}}>🎉</div>
-            <h2 style={{color:T.gold,margin:"0 0 8px",fontSize:22}}>You are going!</h2>
-            <p style={{color:T.muted,fontSize:14,lineHeight:1.6}}>{qty} x {concert.artist} ticket{qty>1?"s":""} confirmed. Your named ticket arrives 48hrs before the show.</p>
+            <h2 style={{color:T.gold,margin:"0 0 8px",fontSize:22}}>You're going!</h2>
+            <p style={{color:T.muted,fontSize:14,lineHeight:1.6}}>{qty} × {concert.artist} ticket{qty>1?"s":""} confirmed. Your named ticket arrives 48hrs before the show.</p>
             <button onClick={onClose} style={{marginTop:20,background:T.gold,border:"none",borderRadius:14,padding:"13px 36px",fontWeight:700,fontSize:14,color:T.bg,cursor:"pointer"}}>Done</button>
           </div>
         )}
@@ -664,17 +662,6 @@ function BuyModal({concert,open,onClose,userTier,verified,onVerify,onSuccess}) {
 }
 
 // ─── Artist Dashboard ─────────────────────────────────────────────────────────
-function MiniBar({ value, max, color }) {
-  const pct = Math.min((value / max) * 100, 100);
-  return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-      <div style={{ width: "100%", height: 80, background: T.border, borderRadius: 6, position: "relative", overflow: "hidden", display: "flex", alignItems: "flex-end" }}>
-        <div style={{ width: "100%", height: pct + "%", background: color, borderRadius: "6px 6px 0 0", transition: "height 1s ease", boxShadow: "0 0 12px " + color + "55" }} />
-      </div>
-    </div>
-  );
-}
-
 function StatCard({ label, value, sub, color = T.gold }) {
   return (
     <div style={{ background: T.card, border: "1px solid " + T.border, borderRadius: 16, padding: "14px 16px", flex: 1 }}>
@@ -692,7 +679,6 @@ function ArtistDashboard() {
 
   return (
     <div style={{ padding: "0 0 20px" }}>
-      {/* Event hero */}
       <div style={{ background: "linear-gradient(135deg,#1A0F28 0%," + T.card + " 100%)", border: "1px solid " + T.border, borderRadius: 20, padding: 18, marginBottom: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: T.gold + "22", border: "1px solid " + T.gold + "44", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>🎤</div>
@@ -714,7 +700,6 @@ function ArtistDashboard() {
         </div>
       </div>
 
-      {/* Key stats */}
       <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
         <StatCard label="Revenue" value={"£" + ev.revenue.toLocaleString()} sub="face value total" color={T.gold} />
         <StatCard label="Waitlist" value={ev.waitlistCount} sub="fans queued" color={T.violet} />
@@ -724,7 +709,6 @@ function ArtistDashboard() {
         <StatCard label="ID Verified" value="100%" sub="of ticket holders" color={T.green} />
       </div>
 
-      {/* Fan tier distribution */}
       <div style={{ background: T.card, border: "1px solid " + T.border, borderRadius: 20, padding: 18, marginBottom: 14 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 14 }}>Fan Tier Distribution</div>
         {[
@@ -747,7 +731,6 @@ function ArtistDashboard() {
         </div>
       </div>
 
-      {/* Sales over time chart */}
       <div style={{ background: T.card, border: "1px solid " + T.border, borderRadius: 20, padding: 18, marginBottom: 14 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 16 }}>Sales This Week</div>
         <div style={{ display: "flex", gap: 8, alignItems: "flex-end", height: 100 }}>
@@ -764,7 +747,6 @@ function ArtistDashboard() {
         <div style={{ fontSize: 11, color: T.muted, marginTop: 12 }}>Thursday spike from Tier 1 early-access window opening.</div>
       </div>
 
-      {/* Recent buyers */}
       <div style={{ background: T.card, border: "1px solid " + T.border, borderRadius: 20, padding: 18 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: T.text, marginBottom: 14 }}>Recent Buyers</div>
         {ev.recentBuyers.map((b, i) => {
@@ -824,7 +806,7 @@ function SettingsDrawer({open,onClose,user,localPhoto,onPhotoChange,onSignOut,sp
       <div onClick={onClose} style={{position:"fixed",inset:0,background:"#00000088",zIndex:200,opacity:open?1:0,pointerEvents:open?"all":"none",transition:"opacity 0.25s",backdropFilter:"blur(8px)"}}/>
       <div style={{position:"fixed",top:0,right:0,bottom:0,width:"88%",maxWidth:360,background:T.surface,zIndex:201,transform:open?"translateX(0)":"translateX(100%)",transition:"transform 0.3s cubic-bezier(0.4,0,0.2,1)",overflowY:"auto",borderLeft:"1px solid "+T.border}}>
         <div style={{background:"linear-gradient(160deg,"+T.card+" 0%,#1A1020 100%)",padding:"52px 20px 24px",position:"relative"}}>
-          <button onClick={onClose} style={{position:"absolute",top:16,right:16,background:T.border,border:"none",color:T.muted,borderRadius:99,width:28,height:28,cursor:"pointer",fontSize:13,display:"flex",alignItems:"center",justifyContent:"center"}}>x</button>
+          <button onClick={onClose} style={{position:"absolute",top:16,right:16,background:T.border,border:"none",color:T.muted,borderRadius:99,width:28,height:28,cursor:"pointer",fontSize:13,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
           <div style={{position:"relative",display:"inline-block",marginBottom:14}}>
             <div style={{width:72,height:72,borderRadius:99,border:"2.5px solid "+T.gold,overflow:"hidden",background:T.border,display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,fontWeight:800,color:T.gold}}>
               {imgSrc ? <img src={imgSrc} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/> : initials}
@@ -862,7 +844,7 @@ function SettingsDrawer({open,onClose,user,localPhoto,onPhotoChange,onSignOut,sp
           <Row icon="🎟" label="Early Access Alerts" sublabel="Get notified when your window opens" right={<Toggle value={earlyAccess} onChange={v => { setEarlyAccess(v); showToast(v?"Early access alerts on":"Early access alerts off"); }}/>}/>
           <SLabel t="Account"/>
           <Row icon="🪪" label="Verify Identity" sublabel="Required for ticket purchases" tag="REQUIRED" onClick={() => { onClose(); showToast("Opening verification..."); }}/>
-          <Row icon="📜" label="Terms and Privacy Policy" onClick={() => showToast("Opening terms...")}/>
+          <Row icon="📜" label="Terms & Privacy Policy" onClick={() => showToast("Opening terms...")}/>
           <Row icon="❓" label="Help Centre" onClick={() => showToast("Opening help centre...")}/>
           <Row icon="💬" label="Contact Support" sublabel="Usually replies within 2 hours" onClick={() => showToast("Opening support...")}/>
           <SLabel t=""/>
@@ -874,6 +856,179 @@ function SettingsDrawer({open,onClose,user,localPhoto,onPhotoChange,onSignOut,sp
   );
 }
 
+// ─── Profile Tab ──────────────────────────────────────────────────────────────
+function ProfileTab({user,localPhoto,score,totalScore,userTier,verified,quizDone,spotifyLinked,appleLinked,waitlists,myTickets,onQuizOpen,onVerifyOpen,onEditOpen,onQrOpen,onWaitlistRemove,showToast}) {
+  const imgSrc = localPhoto || user?.imageUrl;
+  const initials = user?.firstName?.[0] || user?.emailAddresses?.[0]?.emailAddress?.[0]?.toUpperCase() || "F";
+  const name = user?.firstName ? (user.firstName+" "+(user.lastName||"")).trim() : user?.emailAddresses?.[0]?.emailAddress || "Fan";
+  const email = user?.emailAddresses?.[0]?.emailAddress || "";
+
+  const bonusBreakdown = [
+    { label: "Quiz score", pts: score, color: T.gold },
+    { label: "Spotify linked", pts: spotifyLinked?18:0, color: "#1DB954", locked: !spotifyLinked },
+    { label: "Apple Music", pts: appleLinked?8:0, color: T.violet, locked: !appleLinked },
+    { label: "ID verified", pts: verified?5:0, color: T.teal, locked: !verified },
+  ];
+
+  return (
+    <div>
+      {/* Hero card */}
+      <div style={{background:"linear-gradient(135deg,#1A0F28 0%,"+T.card+" 100%)",border:"1px solid "+T.border,borderRadius:20,padding:20,marginBottom:14}}>
+        <div style={{display:"flex",alignItems:"flex-start",gap:16,marginBottom:18}}>
+          <div style={{width:64,height:64,borderRadius:99,border:"2.5px solid "+T.gold,overflow:"hidden",background:T.border,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,fontWeight:800,color:T.gold,flexShrink:0}}>
+            {imgSrc ? <img src={imgSrc} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/> : initials}
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:18,fontWeight:800,color:T.text,marginBottom:3}}>{name}</div>
+            <div style={{fontSize:12,color:T.muted,marginBottom:8,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{email}</div>
+            <TierBadge tier={userTier}/>
+          </div>
+          <button onClick={onEditOpen} style={{background:T.surface,border:"1px solid "+T.border,borderRadius:10,padding:"8px 12px",color:T.muted,fontSize:12,cursor:"pointer",fontWeight:600,flexShrink:0}}>Edit</button>
+        </div>
+
+        {/* Score ring + breakdown */}
+        <div style={{display:"flex",alignItems:"center",gap:20}}>
+          <div style={{position:"relative",flexShrink:0}}>
+            <ScoreRing score={totalScore} size={80} animated/>
+            <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+              <span style={{fontSize:20,fontWeight:900,color:T.gold}}>{totalScore}</span>
+              <span style={{fontSize:9,color:T.muted}}>/ 100</span>
+            </div>
+          </div>
+          <div style={{flex:1}}>
+            {bonusBreakdown.map(b => (
+              <div key={b.label} style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
+                <span style={{fontSize:11,color:b.locked?T.subtle:T.muted}}>{b.label}</span>
+                <span style={{fontSize:11,fontWeight:700,color:b.locked?T.subtle:b.color}}>
+                  {b.locked ? "—" : "+"+b.pts}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Action cards */}
+      <div style={{display:"flex",gap:10,marginBottom:14}}>
+        <button onClick={onQuizOpen} style={{flex:1,background:T.card,border:"1px solid "+T.border,borderRadius:16,padding:"14px 12px",cursor:"pointer",textAlign:"left"}}>
+          <div style={{fontSize:20,marginBottom:8}}>🎯</div>
+          <div style={{fontSize:13,fontWeight:700,color:T.text}}>{quizDone?"Retake Quiz":"Take Quiz"}</div>
+          <div style={{fontSize:11,color:T.muted,marginTop:3}}>{quizDone?"Update your score":"Earn up to 67 pts"}</div>
+        </button>
+        <button onClick={onVerifyOpen} style={{flex:1,background:verified?T.green+"0D":T.card,border:"1px solid "+(verified?T.green+"44":T.border),borderRadius:16,padding:"14px 12px",cursor:"pointer",textAlign:"left"}}>
+          <div style={{fontSize:20,marginBottom:8}}>{verified?"✅":"🪪"}</div>
+          <div style={{fontSize:13,fontWeight:700,color:verified?T.green:T.text}}>{verified?"Verified":"Verify ID"}</div>
+          <div style={{fontSize:11,color:T.muted,marginTop:3}}>{verified?"Identity confirmed":"+5 pts · required to buy"}</div>
+        </button>
+      </div>
+
+      {/* Waitlist */}
+      {waitlists.length > 0 && (
+        <div style={{background:T.card,border:"1px solid "+T.border,borderRadius:20,padding:18,marginBottom:14}}>
+          <div style={{fontSize:13,fontWeight:700,color:T.text,marginBottom:12}}>Your Waitlists</div>
+          {waitlists.map((w,i) => (
+            <div key={w.id} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<waitlists.length-1?"1px solid "+T.border:"none"}}>
+              <div style={{width:36,height:36,borderRadius:9,background:T.violet+"18",border:"1px solid "+T.violet+"33",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>🎵</div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:13,fontWeight:700,color:T.text}}>{w.artist}</div>
+                <div style={{fontSize:11,color:T.muted}}>Position #{w.position} · {w.date}</div>
+              </div>
+              <button onClick={() => onWaitlistRemove(w.id)} style={{background:"none",border:"1px solid "+T.border,borderRadius:8,padding:"5px 10px",color:T.muted,fontSize:11,cursor:"pointer"}}>Leave</button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Upcoming shows */}
+      {myTickets.length > 0 && (
+        <div style={{background:T.card,border:"1px solid "+T.border,borderRadius:20,padding:18}}>
+          <div style={{fontSize:13,fontWeight:700,color:T.text,marginBottom:12}}>Your Tickets</div>
+          {myTickets.map((t,i) => (
+            <div key={t.id} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<myTickets.length-1?"1px solid "+T.border:"none"}}>
+              <div style={{width:42,height:42,borderRadius:9,overflow:"hidden",flexShrink:0}}>
+                <img src={t.img} alt={t.artist} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:13,fontWeight:700,color:T.text}}>{t.artist}</div>
+                <div style={{fontSize:11,color:T.muted,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{t.seat}</div>
+              </div>
+              <button onClick={() => onQrOpen(t)} style={{background:T.gold+"18",border:"1px solid "+T.gold+"44",borderRadius:8,padding:"6px 10px",color:T.gold,fontSize:11,cursor:"pointer",fontWeight:700,flexShrink:0}}>QR</button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {myTickets.length === 0 && waitlists.length === 0 && (
+        <div style={{textAlign:"center",padding:"32px 20px",color:T.muted}}>
+          <div style={{fontSize:36,marginBottom:12}}>🎫</div>
+          <div style={{fontSize:14,fontWeight:600,marginBottom:6}}>No tickets yet</div>
+          <div style={{fontSize:13}}>Browse upcoming shows and grab early access.</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Tickets Tab ──────────────────────────────────────────────────────────────
+function TicketsTab({myTickets,onQrOpen}) {
+  if (myTickets.length === 0) {
+    return (
+      <div style={{textAlign:"center",padding:"60px 20px"}}>
+        <div style={{fontSize:52,marginBottom:16}}>🎫</div>
+        <div style={{fontSize:18,fontWeight:800,color:T.text,marginBottom:8}}>No tickets yet</div>
+        <div style={{fontSize:14,color:T.muted,lineHeight:1.6}}>Head to Discover to find shows and get early access with your Fan Score.</div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {myTickets.map((t,i) => {
+        const concertInfo = CONCERTS_DATA.find(c => c.artist === t.artist);
+        return (
+          <div key={t.id} style={{background:T.card,border:"1px solid "+T.border,borderRadius:20,overflow:"hidden",marginBottom:14}}>
+            <div style={{position:"relative",height:120}}>
+              <img src={t.img} alt={t.artist} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+              <div style={{position:"absolute",inset:0,background:"linear-gradient(to top,"+T.card+" 0%,transparent 60%)"}}/>
+              <div style={{position:"absolute",bottom:12,left:16}}>
+                <div style={{fontSize:18,fontWeight:900,color:"#fff"}}>{t.artist}</div>
+                <div style={{fontSize:11,color:"#ffffff88"}}>{t.venue}</div>
+              </div>
+              <div style={{position:"absolute",top:12,right:12,background:T.gold,borderRadius:99,padding:"3px 10px",fontSize:11,color:T.bg,fontWeight:800}}>£{t.price}</div>
+            </div>
+            <div style={{padding:"14px 16px 16px"}}>
+              <div style={{display:"flex",gap:8,marginBottom:12}}>
+                <div style={{flex:1,background:T.surface,borderRadius:10,padding:"10px 12px"}}>
+                  <div style={{fontSize:10,color:T.muted,marginBottom:3}}>DATE</div>
+                  <div style={{fontSize:12,fontWeight:700,color:T.text}}>{t.date}</div>
+                </div>
+                <div style={{flex:1,background:T.surface,borderRadius:10,padding:"10px 12px"}}>
+                  <div style={{fontSize:10,color:T.muted,marginBottom:3}}>TIME</div>
+                  <div style={{fontSize:12,fontWeight:700,color:T.text}}>{t.time}</div>
+                </div>
+              </div>
+              <div style={{background:T.surface,borderRadius:10,padding:"10px 12px",marginBottom:12}}>
+                <div style={{fontSize:10,color:T.muted,marginBottom:3}}>SEAT</div>
+                <div style={{fontSize:12,fontWeight:700,color:T.text}}>{t.seat}</div>
+              </div>
+              <div style={{display:"flex",gap:8}}>
+                <div style={{flex:1,background:T.gold+"0D",border:"1px solid "+T.gold+"33",borderRadius:10,padding:"8px 12px"}}>
+                  <div style={{fontSize:10,color:T.muted,marginBottom:2}}>TICKET ID</div>
+                  <div style={{fontSize:10,color:T.gold,fontFamily:"monospace",fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{String(t.id).slice(-8)}</div>
+                </div>
+                <button onClick={() => onQrOpen(t)} style={{background:T.gold,border:"none",borderRadius:10,padding:"8px 20px",color:T.bg,fontSize:13,fontWeight:800,cursor:"pointer",flexShrink:0}}>
+                  Show QR
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Main App ─────────────────────────────────────────────────────────────────
 function MainApp() {
   const {signOut} = useClerk();
   const {user} = useUser();
@@ -904,6 +1059,7 @@ function MainApp() {
   const [buying, setBuying] = useState(null);
   const [expandConcert, setExpandConcert] = useState(null);
   const [qrTicket, setQrTicket] = useState(null);
+  const [qrOpen, setQrOpen] = useState(false);
 
   const bonusScore = (spotifyLinked?18:0)+(appleLinked?8:0)+(verified?5:0);
   const totalScore = Math.min(score+bonusScore, 100);
@@ -948,6 +1104,11 @@ function MainApp() {
     showToast(qty+" ticket"+(qty>1?"s":"")+" confirmed for "+concert.artist,"success");
   }
 
+  function openQr(ticket) {
+    setQrTicket(ticket);
+    setQrOpen(true);
+  }
+
   function handleSecretTap() {
     setArtistMode(m => {
       const next = !m;
@@ -971,6 +1132,7 @@ function MainApp() {
     <div style={{fontFamily:"'Inter','Segoe UI',sans-serif",background:T.bg,minHeight:"100vh",color:T.text,maxWidth:480,margin:"0 auto",paddingBottom:80}}>
       <Toast toasts={toasts}/>
 
+      {/* Header */}
       <div style={{background:T.surface,borderBottom:"1px solid "+T.border,padding:"16px 18px 14px",position:"sticky",top:0,zIndex:10,backdropFilter:"blur(12px)"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <Logo size={24} onSecretTap={handleSecretTap}/>
@@ -990,12 +1152,14 @@ function MainApp() {
         </h1>
       </div>
 
+      {/* Tab content */}
       <div style={{padding:"18px 14px"}}>
         {tab==="discover" && (
           <>
+            {/* Fan score banner */}
             {!quizDone ? (
               <div style={{background:"linear-gradient(135deg,"+T.card+" 0%,#1A0F28 100%)",border:"1px solid "+T.borderHi,borderRadius:18,padding:"18px",marginBottom:18}}>
-                <div style={{fontSize:15,fontWeight:800,color:T.text,marginBottom:6}}>What is your Fan Score?</div>
+                <div style={{fontSize:15,fontWeight:800,color:T.text,marginBottom:6}}>What's your Fan Score?</div>
                 <p style={{fontSize:13,color:T.muted,margin:"0 0 14px",lineHeight:1.6}}>Take a 2-minute quiz to unlock your tier and get early access.</p>
                 <button onClick={() => setQuizOpen(true)} style={{background:T.gold,border:"none",borderRadius:10,padding:"11px 20px",fontWeight:700,fontSize:14,color:T.bg,cursor:"pointer"}}>Take the Quiz</button>
               </div>
@@ -1016,11 +1180,126 @@ function MainApp() {
               </div>
             )}
 
+            {/* Search */}
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search artists or venues..."
               style={{width:"100%",background:T.card,border:"1px solid "+T.border,borderRadius:12,padding:"11px 16px",color:T.text,fontSize:14,outline:"none",boxSizing:"border-box",marginBottom:12}}
               onFocus={e => e.target.style.borderColor=T.gold}
               onBlur={e => e.target.style.borderColor=T.border}/>
 
-            <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,marginBottom:18}}>
+            {/* Genre chips */}
+            <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,marginBottom:18,scrollbarWidth:"none"}}>
               {GENRES.map(g => (
-                <button key={g} onClick={() => setGenreFilter(g)} style={{background:genreFilter===g?T.gold:T.card,color:genreFilter===g?T.bg:T.muted,border:"1px solid "+(genreFilter===g?T.gold:T.border),borderRadius:99,padding:"6px 14p
+                <button key={g} onClick={() => setGenreFilter(g)} style={{background:genreFilter===g?T.gold:T.card,color:genreFilter===g?T.bg:T.muted,border:"1px solid "+(genreFilter===g?T.gold:T.border),borderRadius:99,padding:"6px 14px",fontSize:12,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.15s"}}>
+                  {g}
+                </button>
+              ))}
+            </div>
+
+            {/* Concert cards */}
+            {filteredConcerts.length === 0 ? (
+              <div style={{textAlign:"center",padding:"40px 20px",color:T.muted}}>
+                <div style={{fontSize:36,marginBottom:12}}>🔍</div>
+                <div style={{fontSize:14,fontWeight:600}}>No shows found</div>
+                <div style={{fontSize:13,marginTop:6}}>Try a different search or genre filter.</div>
+              </div>
+            ) : (
+              filteredConcerts.map(c => (
+                <ConcertCard
+                  key={c.id}
+                  concert={c}
+                  userTier={userTier}
+                  waitlisted={!!waitlists.find(w => w.id===c.id)}
+                  onWaitlist={toggleWaitlist}
+                  onExpand={setExpandConcert}
+                  onBuy={concert => setBuying(concert)}
+                />
+              ))
+            )}
+          </>
+        )}
+
+        {tab==="profile" && (
+          <ProfileTab
+            user={user}
+            localPhoto={localPhoto}
+            score={score}
+            totalScore={totalScore}
+            userTier={userTier}
+            verified={verified}
+            quizDone={quizDone}
+            spotifyLinked={spotifyLinked}
+            appleLinked={appleLinked}
+            waitlists={waitlists}
+            myTickets={myTickets}
+            onQuizOpen={() => setQuizOpen(true)}
+            onVerifyOpen={() => setVerifyOpen(true)}
+            onEditOpen={() => setEditOpen(true)}
+            onQrOpen={openQr}
+            onWaitlistRemove={id => toggleWaitlist(id)}
+            showToast={showToast}
+          />
+        )}
+
+        {tab==="tickets" && (
+          <TicketsTab myTickets={myTickets} onQrOpen={openQr}/>
+        )}
+
+        {tab==="artist" && artistMode && (
+          <ArtistDashboard/>
+        )}
+      </div>
+
+      {/* Bottom nav */}
+      <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:T.surface,borderTop:"1px solid "+T.border,display:"flex",zIndex:20,backdropFilter:"blur(12px)"}}>
+        {tabs.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} style={{flex:1,padding:"12px 0 16px",background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:4,transition:"opacity 0.15s",opacity:tab===t.id?1:0.45}}>
+            <span style={{fontSize:18,lineHeight:1}}>{t.icon}</span>
+            <span style={{fontSize:10,fontWeight:700,color:tab===t.id?T.gold:T.muted,letterSpacing:0.3}}>{t.label}</span>
+            {tab===t.id && <div style={{width:20,height:2,background:T.gold,borderRadius:99,marginTop:2}}/>}
+          </button>
+        ))}
+      </div>
+
+      {/* Modals */}
+      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} onComplete={s => { setScore(s); setQuizDone(true); }}/>
+      <VerifyModal open={verifyOpen} onClose={() => setVerifyOpen(false)} onVerified={() => { setVerified(true); showToast("Identity verified","success"); }}/>
+      <EditProfileModal open={editOpen} onClose={() => setEditOpen(false)} displayName={name} bio={bio} location={location} onSave={(n,b,l) => { setDisplayName(n); setBio(b); setLocation(l); showToast("Profile updated","success"); }}/>
+      <ConcertDetailModal concert={expandConcert} open={!!expandConcert} onClose={() => setExpandConcert(null)} userTier={userTier} waitlisted={!!waitlists.find(w => w.id===expandConcert?.id)} onWaitlist={toggleWaitlist} onBuy={c => { setBuying(c); }}/>
+      <BuyModal concert={buying} open={!!buying} onClose={() => setBuying(null)} userTier={userTier} verified={verified} onVerify={() => setVerifyOpen(true)} onSuccess={handleTicketSuccess}/>
+      <TicketQRModal ticket={qrTicket} open={qrOpen} onClose={() => setQrOpen(false)}/>
+      <SettingsDrawer
+        open={drawerOpen} onClose={() => setDrawerOpen(false)}
+        user={user} localPhoto={localPhoto} onPhotoChange={setLocalPhoto}
+        onSignOut={() => signOut()}
+        spotifyLinked={spotifyLinked} setSpotifyLinked={setSpotifyLinked}
+        appleLinked={appleLinked} setAppleLinked={setAppleLinked}
+        notifications={notifications} setNotifications={setNotifications}
+        emailAlerts={emailAlerts} setEmailAlerts={setEmailAlerts}
+        earlyAccess={earlyAccess} setEarlyAccess={setEarlyAccess}
+        score={totalScore} userTier={userTier} showToast={showToast}
+      />
+    </div>
+  );
+}
+
+// ─── App root ─────────────────────────────────────────────────────────────────
+export default function App() {
+  const [phase, setPhase] = useState("splash"); // splash | onboarding | auth | app
+  const [authMode, setAuthMode] = useState("sign-in");
+
+  return (
+    <>
+      {phase === "splash" && <SplashScreen onDone={() => setPhase("onboarding")}/>}
+      {phase === "onboarding" && <OnboardingScreen onDone={() => setPhase("auth")}/>}
+      {phase === "auth" && (
+        <SignedOut>
+          <AuthScreen mode={authMode} setMode={setAuthMode}/>
+        </SignedOut>
+      )}
+      <SignedIn>
+        {phase !== "app" && setPhase("app")}
+        <MainApp/>
+      </SignedIn>
+    </>
+  );
+}
